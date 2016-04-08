@@ -1,0 +1,214 @@
+[
+    {
+        "title": "Row for info boxes",
+        "columns": [
+            {
+                "title": "Column 1",
+                "class": "col-md-4",
+                "infoboxes": [
+                    {
+                        "title": "Last consumed real power 1",
+                        "color": "green",
+                        "icon": "fa fa-line-chart",
+                        "value": {
+                            "decimals": 1,
+                            "type": "lastValue",
+                            "sensorId": "000137187-Consumed real power-pc1"
+                        },
+                        "status": "More about weather",
+                        "link": "http://atena.ijs.si/en/predefined/1/00013718"
+                    }
+                ]
+            },
+            {
+                "title": "Column 2",
+                "class": "col-md-4",
+                "infoboxes": [
+                    {
+                        "title": "Last consumed real power 2",
+                        "color": "blue",
+                        "icon": "fa fa-line-chart",
+                        "value": {
+                            "decimals": 1,
+                            "type": "lastValue",
+                            "sensorId": "000160519-Consumed real power-pc2"
+                        },
+                        "status": "More about weather",
+                        "link": "http://atena.ijs.si/en/predefined/1/00013718"
+                    }
+                ]
+            },
+            {
+                "title": "Column 3",
+                "class": "col-md-4",
+                "infoboxes": [
+                    {
+                        "title": "Last consumed reactive power 1",
+                        "color": "red",
+                        "icon": "fa fa-line-chart",
+                        "value": {
+                            "decimals": 1,
+                            "type": "lastValue",
+                            "sensorId": "000137187-Consumed reactive power-qc1"
+                        },
+                        "status": "More about weather",
+                        "link": "http://atena.ijs.si/en/predefined/1/00013718"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "title": "Row for graphs",
+        "columns": [
+            {
+                "title": "Column 1",
+                "class": "col-md-4",
+                "charts": [
+                    {
+                        "title": "Consumed real power - last week",
+                        "endDate": "2015-03-20",
+                        "timeSpan": "7",
+                        "series": [
+                            {
+                                "sensorId": "000137187-Consumed real power-pc1",
+                                "aggregate": "raw",
+                                "window": "raw"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "title": "Column 2",
+                "class": "col-md-4",
+                "charts": [
+                    {
+                        "title": "Consumeed real power - month",
+                        "endDate": "2015-10-20",
+                        "timeSpan": "30",
+                        "series": [
+                            {
+                                "sensorId": "000160519-Consumed real power-pc2",
+                                "aggregate": "raw",
+                                "window": "raw"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "title": "Column 3",
+                "class": "col-md-4",
+                "charts": [
+                    {
+                        "title": "Consumed real power - day",
+                        "endDate": "2015-10-20",
+                        "timeSpan": "2",
+                        "series": [
+                            {
+                                "sensorId": "000160519-Consumed real power-pc2",
+                                "aggregate": "raw",
+                                "window": "raw"
+                            },
+                            {
+                                "sensorId": "000160519-Consumed real power-pc2",
+                                "aggregate": "ma",
+                                "window": "1h"
+                            },
+                            {
+                                "sensorId": "000160519-Consumed real power-pc2",
+                                "aggregate": "ema",
+                                "window": "6h"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "title": "Row for graphs 2",
+        "columns": [
+            {
+                "title": "Column 1",
+                "class": "col-md-4",
+                "charts": [
+                    {
+                        "title": "Generated real power - 3 days",
+                        "endDate": "2015-11-07",
+                        "timeSpan": "3",
+                        "series": [
+                            {
+                                "sensorId": "000118966-Consumed reactive power-qc1",
+                                "aggregate": "raw",
+                                "window": "raw"
+                            },
+                            {
+                                "sensorId": "000118966-Consumed reactive power-qc1",
+                                "aggregate": "ema",
+                                "window": "1h"
+                            },
+                            {
+                                "sensorId": "000118966-Consumed reactive power-qc1",
+                                "aggregate": "ema",
+                                "window": "6h"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "title": "Column 2",
+                "class": "col-md-4",
+                "charts": [
+                    {
+                        "title": "Consumed reactive power",
+                        "endDate": "2015-03-20",
+                        "timeSpan": "7",
+                        "series": [
+                            {
+                                "sensorId": "000137187-Consumed reactive power-qc1",
+                                "aggregate": "raw",
+                                "window": "raw"
+                            },
+                            {
+                                "sensorId": "000137187-Consumed reactive power-qc1",
+                                "aggregate": "var",
+                                "window": "6h"
+                            },
+                            {
+                                "sensorId": "000137187-Consumed reactive power-qc1",
+                                "aggregate": "var",
+                                "window": "1d"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "title": "Column 3",
+                "class": "col-md-4",
+                "charts": [
+                    {
+                        "title": "Generated reactive power",
+                        "endDate": "2015-10-20",
+                        "timeSpan": "90",
+                        "series": [
+                            {
+                                "sensorId": "000137187-Consumed reactive power-qc1",
+                                "aggregate": "raw",
+                                "window": "raw"
+                            },
+                            {
+                                "sensorId": "000137187-Consumed reactive power-qc1",
+                                "aggregate": "ma",
+                                "window": "1w"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+]
