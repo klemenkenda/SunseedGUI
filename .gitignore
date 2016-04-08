@@ -163,3 +163,4 @@ $RECYCLE.BIN/
 .DS_Store
 schema/db/
 logs/
+config.php
