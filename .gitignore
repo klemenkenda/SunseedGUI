@@ -164,3 +164,4 @@ $RECYCLE.BIN/
 schema/db/
 logs/
 config.php
+admin/config.php
