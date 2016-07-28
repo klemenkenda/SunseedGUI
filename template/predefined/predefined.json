@@ -63,63 +63,22 @@
         "columns": [
             {
                 "title": "Column 1",
-                "class": "col-md-4",
+                "class": "col-md-12",
                 "charts": [
                     {
                         "title": "Consumed real power - last week",
-                        "endDate": "2015-03-20",
+                        "endDate": "now",
                         "timeSpan": "7",
                         "series": [
                             {
                                 "sensorId": "000137187-Consumed real power-pc1",
                                 "aggregate": "raw",
                                 "window": "raw"
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                "title": "Column 2",
-                "class": "col-md-4",
-                "charts": [
-                    {
-                        "title": "Consumeed real power - month",
-                        "endDate": "2015-10-20",
-                        "timeSpan": "30",
-                        "series": [
-                            {
-                                "sensorId": "000160519-Consumed real power-pc2",
-                                "aggregate": "raw",
-                                "window": "raw"
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                "title": "Column 3",
-                "class": "col-md-4",
-                "charts": [
-                    {
-                        "title": "Consumed real power - day",
-                        "endDate": "2015-10-20",
-                        "timeSpan": "2",
-                        "series": [
-                            {
-                                "sensorId": "000160519-Consumed real power-pc2",
-                                "aggregate": "raw",
-                                "window": "raw"
                             },
                             {
-                                "sensorId": "000160519-Consumed real power-pc2",
-                                "aggregate": "ma",
-                                "window": "1h"
-                            },
-                            {
-                                "sensorId": "000160519-Consumed real power-pc2",
-                                "aggregate": "ema",
-                                "window": "6h"
+                                "sensorId": "000137187-Consumed real power-pc1",
+                                "aggregate": "prediction",
+                                "window": "raw"
                             }
                         ]
                     }
@@ -132,78 +91,65 @@
         "columns": [
             {
                 "title": "Column 1",
-                "class": "col-md-4",
+                "class": "col-md-12",
                 "charts": [
                     {
-                        "title": "Generated real power - 3 days",
-                        "endDate": "2015-11-07",
-                        "timeSpan": "3",
-                        "series": [
-                            {
-                                "sensorId": "000118966-Consumed reactive power-qc1",
-                                "aggregate": "raw",
-                                "window": "raw"
-                            },
-                            {
-                                "sensorId": "000118966-Consumed reactive power-qc1",
-                                "aggregate": "ema",
-                                "window": "1h"
-                            },
-                            {
-                                "sensorId": "000118966-Consumed reactive power-qc1",
-                                "aggregate": "ema",
-                                "window": "6h"
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                "title": "Column 2",
-                "class": "col-md-4",
-                "charts": [
-                    {
-                        "title": "Consumed reactive power",
-                        "endDate": "2015-03-20",
+                        "title": "Weather - last week",
+                        "endDate": "now",
                         "timeSpan": "7",
                         "series": [
                             {
-                                "sensorId": "000137187-Consumed reactive power-qc1",
+                                "sensorId": "FIO-Kromberk-FIO-temperature",
                                 "aggregate": "raw",
                                 "window": "raw"
                             },
                             {
-                                "sensorId": "000137187-Consumed reactive power-qc1",
-                                "aggregate": "var",
-                                "window": "6h"
+                                "sensorId": "FIO-Kromberk-FIO-humidity",
+                                "aggregate": "raw",
+                                "window": "raw"
                             },
                             {
-                                "sensorId": "000137187-Consumed reactive power-qc1",
-                                "aggregate": "var",
-                                "window": "1d"
+                                "sensorId": "FIO-Kromberk-FIO-windSpeed",
+                                "aggregate": "raw",
+                                "window": "raw"
+                            },
+                            {
+                                "sensorId": "FIO-Kromberk-FIO-cloudCover",
+                                "aggregate": "raw",
+                                "window": "raw"
                             }
                         ]
                     }
                 ]
-            },
+            }
+        ]
+    },    
+    {
+        "title": "Row for graphs 3",
+        "columns": [
             {
-                "title": "Column 3",
-                "class": "col-md-4",
+                "title": "Column 1",
+                "class": "col-md-12",
                 "charts": [
                     {
-                        "title": "Generated reactive power",
-                        "endDate": "2015-10-20",
-                        "timeSpan": "90",
+                        "title": "Metadata - last week",
+                        "endDate": "now",
+                        "timeSpan": "7",
                         "series": [
                             {
-                                "sensorId": "000137187-Consumed reactive power-qc1",
+                                "sensorId": "holiday",
                                 "aggregate": "raw",
                                 "window": "raw"
                             },
                             {
-                                "sensorId": "000137187-Consumed reactive power-qc1",
-                                "aggregate": "ma",
-                                "window": "1w"
+                                "sensorId": "weekEnd",
+                                "aggregate": "raw",
+                                "window": "raw"
+                            },
+                            {
+                                "sensorId": "dayOfWeek",
+                                "aggregate": "raw",
+                                "window": "raw"
                             }
                         ]
                     }

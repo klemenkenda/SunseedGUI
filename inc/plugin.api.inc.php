@@ -312,8 +312,10 @@ function getNCurrentAggregates($name) {
 function getPredictions($sensor, $method, $start, $end) {
     // Val, Timestamp   
     
-    $json[0]["Val"] = 15;
-    $json[0]["Timestamp"] = "2016-03-17T00:00:00.000";
+    // $json[0]["Val"] = 15;
+    // $json[0]["Timestamp"] = "2016-03-17T00:00:00.000";
+    $start = $start . " 23:59:59.999";
+    // echo $start;
     
     $SQL = "SELECT * FROM predictions WHERE pr_sensor = '$sensor' AND pr_type = '$method' AND pr_timestamp > '$start' AND pr_timestamp < '$end'";
     $result = mysql_query($SQL);

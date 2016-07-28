@@ -382,14 +382,18 @@ function InfoBox(containerId, systemNodes, infoBoxConfig) {
         }
         
         var myUrl;
+        /* define prediction models */
+        this["000137187-Consumed real power-pc1"] = "ma";
 		
 		if (this.aggregateType == "prediction") {
-			if (typeof this[this.dataType] == 'undefined') {
-				alert("Prediction not available for this sensor.");
+			/*
+            if (typeof this[this.dataType] == 'undefined') {
+				alert("Prediction not available for this sensor: " + this.dataType);
 			}
 			else {
-				myUrl = "/proxy.php?cmd=/AggregateService/services/prediction-api/get-predictions?p=" + this.dataType + ":" + this[this.dataType] + ":"+ this.dateStart + ":" + this.dateEnd;
-			}
+				myUrl = "/api/get-predictions?p=" + escape(this.dataType) + ":" + this[this.dataType] + ":"+ this.dateStart + ":" + this.dateEnd;  
+			}*/
+            myUrl = "/api/get-predictions?p=" + escape(this.dataType) + ":ma:"+ this.dateStart + ":" + this.dateEnd;
 		}
         else if (this.raw == "No") {
             myUrl = '/api/get-aggregates?p=' + escape(this.dataType) + ':' + this.aggregateType + ':' + this.timeInterval + ':' + this.dateStart + ':' + this.dateEnd;
@@ -622,14 +626,18 @@ function HighChart(container, chartNumber, systemNodes) {
             this.raw = "No";
         }
         var myUrl;
+        /* define prediction models */
+        this["000137187-Consumed real power-pc1"] = "ma";
 		
 		if (this.aggregateType == "prediction") {
-			if (typeof this[this.dataType] == 'undefined') {
+			/*
+            if (typeof this[this.dataType] == 'undefined') {
 				alert("Prediction not available for this sensor.");
 			}
 			else {
-				myUrl = "/proxy.php?cmd=/AggregateService/services/prediction-api/get-predictions?p=" + this.dataType + ":" + this[this.dataType] + ":"+ this.dateStart + ":" + this.dateEnd;
-			}
+				myUrl = "/api/get-predictions?p=" + this.dataType + ":" + this[this.dataType] + ":"+ this.dateStart + ":" + this.dateEnd;
+			}*/
+            myUrl = "/api/get-predictions?p=" + escape(this.dataType) + ":ma:"+ this.dateStart + ":" + this.dateEnd;
 		}
         else if (this.raw == "No") {
             myUrl = '/api/get-aggregates?p=' + escape(this.dataType) + ':' + this.aggregateType + ':' + this.timeInterval + ':' + this.dateStart + ':' + this.dateEnd;
