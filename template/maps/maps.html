@@ -1,5 +1,8 @@
 <script src="/template/js/markerclusterer.min.js"></script>
 <script>
+    
+var map;
+    
 // start request
 $.ajax({
   url: '/api/get-nodes',
@@ -15,7 +18,7 @@ function mapLoadedNodes(data) {
 
 function handleGoogleMap() {
 	"use strict";
-	var map;
+	// var map;
 	var mc;
 	
 	var styles =[{"featureType":"water","elementType":"geometry","stylers":[{"color":"#000000"},{"lightness":17}]},{"featureType":"landscape","elementType":"geometry","stylers":[{"color":"#000000"},{"lightness":20}]},{"featureType":"road.highway","elementType":"geometry.fill","stylers":[{"color":"#000000"},{"lightness":17}]},{"featureType":"road.highway","elementType":"geometry.stroke","stylers":[{"color":"#000000"},{"lightness":29},{"weight":0.2}]},{"featureType":"road.arterial","elementType":"geometry","stylers":[{"color":"#000000"},{"lightness":18}]},{"featureType":"road.local","elementType":"geometry","stylers":[{"color":"#000000"},{"lightness":16}]},{"featureType":"poi","elementType":"geometry","stylers":[{"color":"#000000"},{"lightness":21}]},{"elementType":"labels.text.stroke","stylers":[{"visibility":"on"},{"color":"#000000"},{"lightness":16}]},{"elementType":"labels.text.fill","stylers":[{"saturation":36},{"color":"#000000"},{"lightness":40}]},{"elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"featureType":"transit","elementType":"geometry","stylers":[{"color":"#000000"},{"lightness":19}]},{"featureType":"administrative","elementType":"geometry.fill","stylers":[{"color":"#000000"},{"lightness":20}]},{"featureType":"administrative","elementType":"geometry.stroke","stylers":[{"color":"#000000"},{"lightness":17},{"weight":1.2}]}];
@@ -43,6 +46,7 @@ function handleGoogleMap() {
 		
 	
 	this.addMarkers = function(data) {
+        
         console.log(data);
 		var nodes = JSON.parse(data);
 		var i, j;
@@ -87,13 +91,14 @@ function handleGoogleMap() {
 			    this.infowindow.open(map, this);
 			});
 			markers.push(the_marker);
+            // alert(2);
 			the_marker.setMap(map);
 		}
 		mc = new MarkerClusterer(map, markers);
 	}
 	
 	$(window).resize(function() {
-        	google.maps.event.trigger(mapDefault, "resize");
+        	// google.maps.event.trigger(map, "resize");
 	});
 	
 	return this;

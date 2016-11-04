@@ -19,7 +19,7 @@
         var t, result = null;
 
         if (typeof mysql_string === 'string') {
-            t = mysql_string.split(/[- :]/);
+            t = mysql_string.split(/[- T:]/);
 
             //when t[3], t[4] and t[5] are missing they defaults to zero
             result = new Date(t[0], t[1] - 1, t[2], t[3] || 0, t[4] || 0, t[5] || 0);
@@ -97,6 +97,10 @@ function SystemNodes() {
  * Predefined visualization object; visualizes predefined timeseries or numeric data
  */
 
+/**
+ * Predefined visualization object; visualizes predefined timeseries or numeric data
+ */
+
 function PredefinedVisualization(systemNodes) {
     this.config;
     this.chartNumber = 0;
@@ -149,7 +153,7 @@ function PredefinedVisualization(systemNodes) {
      * @param columnid {string} HTML id of the column, where we are adding the chart to.
      * @param chartTitle {string} HTML DIV id for the container of the highchart
      */
-    this.addNewProfile = function(columnid, profileTitle) {   
+    this.addNewProfile = function(columnid, profileTitle, profileConfig) {   
     
         this.profileNumber = this.profiles.length + 1;
         $("#" + columnid).append(            
@@ -166,31 +170,50 @@ function PredefinedVisualization(systemNodes) {
                 '</div> ' +
                 '<div class="panel-body"> ' +
                     '<form class="form-horizontal form-bordered"> ' +
-                        '<div id="container'+ this.profileNumber + '" class="panel-body chart-container"> </div> ' +
+                        '<div id="pcontainer'+ this.profileNumber + '" class="panel-body chart-container"> </div> ' +
                     '</form> ' +
                 '</div> ' +                
             '</div>'
         );
         
         $('#ucontainer' + this.profileNumber).trigger('create');
-        this.profiles[this.profileNumber - 1] = new HighChartProfile("container" + this.profileNumber, this.profileNumber, this.systemNodes);
+        this.profiles[this.profileNumber - 1] = new Profile("pcontainer" + this.profileNumber, this.systemNodes, profileConfig);
         // $('#ucontainer' + this.chartNumber).render();
     };
     
     this.addNewInfobox = function(columnid, title, color, icon, value, status, link, infoBoxConfig) {
-        this.infoBoxNumber = this.infoBoxes.length + 1;
-        $("#" +  columnid).append(
-            '<div class="widget widget-stats bg-' + color + '" id="widget-' + this.infoBoxNumber + '">' +
-                '<div class="stats-icon"><i class="' + icon + '"></i></div>' +
-                '<div class="stats-info">' +
-                    '<h4>' + title + '</h4>' +
-                    '<p>' + value + '</p>' +
-                '</div>' +
-                '<div class="stats-link">' +
-                    '<a href="' +  link + '">' + status + "</a>" +
-                '</div>' +
-            '</div>'
-        );
+        this.infoBoxNumber = this.infoBoxes.length + 1;        
+        
+        if (infoBoxConfig.style == "small") {
+            
+            $("#" +  columnid).append(
+                '<div class="widget widget-stats widget-stats-small bg-' + color + '" id="widget-' + this.infoBoxNumber + '">' +                    
+                    '<div class="stats-info">' +
+                        '<h4>' + title + '</h4>' +                        
+                        '<div class="stats-link">' +
+                            '<a href="' +  link + '">' + status + "</a>" +
+                            '<span class="percentage"></span>' +
+                        '</div>' +
+                        '<p>' + value + '</p>' +                    
+                    '</div>' +
+                '</div>'
+            );
+        } else {        
+            $("#" +  columnid).append(
+                '<div class="widget widget-stats bg-' + color + '" id="widget-' + this.infoBoxNumber + '">' +
+                    '<div class="stats-icon"><i class="' + icon + '"></i></div>' +
+                    '<div class="stats-info">' +
+                        '<h4>' + title + '</h4>' +
+                        '<p>' + value + '</p>' +
+                        '<span class="percentage"></span>' +
+                    '</div>' +
+                    '<div class="stats-link">' +
+                        '<a href="' +  link + '">' + status + "</a>" +
+                    '</div>' +
+                '</div>'
+            );
+        };
+        
         this.infoBoxes[this.infoBoxNumber - 1] = new InfoBox("widget-" + this.infoBoxNumber, this.systemNodes, infoBoxConfig);
     };
     
@@ -200,7 +223,8 @@ function PredefinedVisualization(systemNodes) {
      * @param config {model:predefined~Config} Configuration data for the predefined visualization page
      */
     this.init = function(config) {
-        this.config = config;
+        this.config = config;        
+        console.log("Config"); console.log(this.config);
         
         // traverse config structure, create rows, columns, charts and load the data to the appropriate chart
         $.each(this.config, function(rid, row) {
@@ -218,7 +242,8 @@ function PredefinedVisualization(systemNodes) {
                         // create chart
                         pv.addNewChart("col-" + rid + "-" + cid, chart["title"]);
                         // set chart dates                        
-                        if (chart["endDate"] == "now") var endDate = new Date();
+                        if (chart["endDate"] == "now") //var endDate = new Date();
+                            var endDate = new Date(2016, 7, 17);                        
                         else if (chart["endDate"] == "last") /* TODO */;
                         else {
                             var endDate = Date.createFromMysql(chart["endDate"]);
@@ -231,18 +256,21 @@ function PredefinedVisualization(systemNodes) {
                         // load time series
                         $.each(chart["series"], function(seriesid, series) {
                             console.log(series);
-                            pv.charts[pv.chartNumber - 1].addSeries(series["sensorId"], startDate.toYMD(), endDate.toYMD(), series["aggregate"], series["window"]);
+                            var lineConf = null;
+                            if (series.line != "") lineConf = series.line;                            
+                            pv.charts[pv.chartNumber - 1].addSeries(series["sensorId"], startDate.toYMD(), endDate.toYMD(), series["aggregate"], series["window"], lineConf);
                         });
                     });
                 }
                 // traverse profiles
                 if (col["profiles"]) {
                     $.each(col["profiles"], function(prid, profile) {
-                        pv.addNewProfile("col-" + rid + "-" + cid, profile["title"]);
+                        pv.addNewProfile("col-" + rid + "-" + cid, profile["title"], profile);
                         // set histogram dates
-                        if (profile["endDate"] == "now") var endDate = new Date();
+                        if (profile["endDate"] == "now") // var endDate = new Date();
+                            var endDate = new Date(2016, 7, 17);
                         else if (profile["endDate"] == "last") /* TODO */;
-                        else if (profile["endDate"] == "offsete") {
+                        else if (profile["endDate"] == "offset") {
                             // now
                             var endDate = new Date();
                             // add/substract
@@ -262,6 +290,7 @@ function PredefinedVisualization(systemNodes) {
                             var endDate = Date.createFromMysql(profile["endDate"]);
                         };
                         
+                                            
                         // correct date for QMiner limits
                         endDate.setDate(endDate.getDate() +  1);
                         var startDate = new Date(endDate.getTime());
@@ -281,8 +310,8 @@ function PredefinedVisualization(systemNodes) {
                         title = infobox["title"];
                         color = infobox["color"];
                         icon = infobox["icon"];                        
-                        status = infobox["status"];
-                        link = infobox["link"];
+                        status = infobox["status"].value;                        
+                        link = infobox["status"].link;
                         value = "N/A";
                                                 
                         
@@ -298,13 +327,15 @@ function PredefinedVisualization(systemNodes) {
                             // adding new infoBox
                             pv.addNewInfobox("col-" + rid + "-" + cid, title, color, icon, value, status, link, infobox);
                             
-                            if (infobox["value"]["endDate"] == "now") var endDate = new Date();
+                            if (infobox["value"]["endDate"] == "now") // var endDate = new Date();
+                                var endDate = new Date(2016, 7, 17);
                             // correct date for QMiner limits
                             endDate.setDate(endDate.getDate() + 1);
-                            var startDate = new Date();
+                            // var startDate = new Date();
+                            var startDate = new Date(2016, 7, 17);
                             startDate.setDate(endDate.getDate() - infobox["value"]["timeSpan"]);      
                             
-                            $.each(infobox["value"]["serie2s"], function(isid, series) {
+                            $.each(infobox["value"]["series"], function(isid, series) {                                
                                 pv.infoBoxes[pv.infoBoxNumber - 1].addSeries(series["sensorId"], startDate.toYMD(), endDate.toYMD(), series["aggregate"], series["window"]);    
                             });                            
                         }                                                
@@ -317,12 +348,179 @@ function PredefinedVisualization(systemNodes) {
 
 
 /**
+ * Profile object - graph and data management
+ */
+
+function Profile(containerId, systemNodes, profileConfig) {
+    this.systemNodes = systemNodes;
+    this.config = profileConfig;
+    this.series = [];
+    this.seriesN = [];
+    this.containerId = containerId;
+    
+    pf = this;
+    
+    console.log("\n\n\n");
+    console.log(profileConfig);
+    console.log("\n\n\n");
+    
+    /**
+     * Starting new series load for infobox
+     */
+    this.addSeries = function (dataType, dateStart, dateEnd, aggregateType, timeInterval) {
+        // collecting data        
+        this.dataType = dataType;
+        this.dateStart = dateStart;
+        this.dateEnd = dateEnd;
+        this.aggregateType = aggregateType;
+        this.timeInterval = timeInterval;     
+        
+        // setting object
+        var ib = this;
+        
+        
+        if (this.timeInterval == "raw") {            
+            this.raw = "Yes";
+        } else {            
+            this.raw = "No";
+        }
+        
+        var myUrl;
+		
+		if (this.aggregateType == "prediction") {
+			/*
+            if (typeof this[this.dataType] == 'undefined') {
+				alert("Prediction not available for this sensor.");
+			}
+			else {
+				myUrl = "/proxy.php?cmd=/AggregateService/services/prediction-api/get-predictions?p=" + this.dataType + ":" + this[this.dataType] + ":"+ this.dateStart + ":" + this.dateEnd;
+			}
+            */
+            myUrl = "/api/get-predictions?p=" + this.dataType + ":ma:"+ this.dateStart + ":" + this.dateEnd;
+		}
+        else if (this.raw == "No") {
+            myUrl = '/api/get-aggregates?p=' + escape(this.dataType) + ':' + this.aggregateType + ':' + this.timeInterval + ':' + this.dateStart + ':' + this.dateEnd;
+        }
+        else if (this.raw == "Yes") {
+            myUrl = '/api/get-measurements?p=' + escape(this.dataType) + ':' + this.dateStart + ':' + this.dateEnd;			
+        }
+        else {
+            console.log("ERROR in checking equality!")
+        }
+		console.log(myUrl);
+        // making a copy of this object, so that we preserve data within multiple async calls
+        var contextThis = jQuery.extend({}, this);
+        console.log(contextThis);
+        $.ajax({
+            url: myUrl,
+            success: ib.loadedSeries,
+            context: contextThis,
+			error: function (x, y, z) {console.log(y);}
+        });
+    };
+    
+    /**
+     * Starting new series load for infobox
+     */
+    this.loadedSeries = function(data) {
+        data = JSON.parse(data);
+        this.series[this.series.length] = data;
+        
+        // TODO: vrstni red seriesov je pomemben - včasih se prej naloada drugi, kakor prvi (!)                
+        // find out series #
+        for (var i = 0; i < this.config.series.length; i++) {
+            if (this.config.series[i].sensorId == this.dataType) 
+                this.seriesN[this.series.length - 1] = i;
+        }
+        
+        // is all the data loaded?
+        if (this.series.length == this.config.series.length) {
+            // sort out order
+            // primary = value
+            // secondary = mapping
+            
+            // secondary seriesN = 0, primary seriesN = 1
+            // default
+            var secondaryN = 1;                    
+            var primaryN = 0; // index in primary timeseries
+
+            // reverse load
+            if (this.seriesN[0] == 1) {
+                secondaryN = 0;
+                primaryN = 1;
+            }
+            
+            var primary = this.series[primaryN];
+            var secondary = this.series[secondaryN];
+            
+            var seriesHC = [];
+            
+            $.each(this.config.secValues, function (sid, secValObj) {
+                
+                var secValue = secValObj.value;
+
+                // daily profile
+                var buckets = new Array(24).fill(0);
+                var bucketN = new Array(24).fill(0);
+                var secN = 0;
+
+                $.each(primary, function(mid, point) {
+                    // sync primary and secondary
+                    while ((secN < secondary.length -  1) && (secondary[secN].Timestamp < point.Timestamp)) {
+                        secN++;
+                    }
+
+                    if ((secN < secondary.length) && (secondary[secN].Val == secValue)) {                    
+                        if (secondary[secN].Timestamp == point.Timestamp) {
+                            var nowDate = new Date();
+                            nowDate = Date.createFromMysql(point.Timestamp);                                        
+                            var bN = nowDate.getHours();
+
+                            buckets[bN] += point.Val;
+                            bucketN[bN] += 1;                    
+                        } 
+                    }
+                });
+           
+                // calculate profile
+                for (var i = 0; i < 24; i++) buckets[i] = buckets[i] / bucketN[i];
+
+                console.log(buckets);
+
+                    seriesHC.push({ name: secValObj.name, data: buckets});
+                });
+            
+           
+            
+            $('#' + pf.containerId).highcharts({
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: ''
+                },
+                xAxis: {
+                    categories: [0, 1]
+                },
+                credits: {
+                    enabled: false
+                },
+                series: seriesHC
+            });
+
+            
+        }
+    }
+}
+
+/**
  * Infobox object - value 
  */
 function InfoBox(containerId, systemNodes, infoBoxConfig) {
     this.systemNodes = systemNodes;
     this.config = infoBoxConfig;
     this.series = [];
+    this.seriesN = [];
     this.containerId = containerId;
     
     ib = this;
@@ -382,18 +580,17 @@ function InfoBox(containerId, systemNodes, infoBoxConfig) {
         }
         
         var myUrl;
-        /* define prediction models */
-        this["000137187-Consumed real power-pc1"] = "ma";
 		
 		if (this.aggregateType == "prediction") {
 			/*
             if (typeof this[this.dataType] == 'undefined') {
-				alert("Prediction not available for this sensor: " + this.dataType);
+				alert("Prediction not available for this sensor.");
 			}
 			else {
-				myUrl = "/api/get-predictions?p=" + escape(this.dataType) + ":" + this[this.dataType] + ":"+ this.dateStart + ":" + this.dateEnd;  
-			}*/
-            myUrl = "/api/get-predictions?p=" + escape(this.dataType) + ":ma:"+ this.dateStart + ":" + this.dateEnd;
+				myUrl = "/proxy.php?cmd=/AggregateService/services/prediction-api/get-predictions?p=" + this.dataType + ":" + this[this.dataType] + ":"+ this.dateStart + ":" + this.dateEnd;
+			}
+            */
+            myUrl = "/api/get-predictions?p=" + this.dataType + ":ma:"+ this.dateStart + ":" + this.dateEnd;
 		}
         else if (this.raw == "No") {
             myUrl = '/api/get-aggregates?p=' + escape(this.dataType) + ':' + this.aggregateType + ':' + this.timeInterval + ':' + this.dateStart + ':' + this.dateEnd;
@@ -412,7 +609,7 @@ function InfoBox(containerId, systemNodes, infoBoxConfig) {
             url: myUrl,
             success: ib.loadedSeries,
             context: contextThis,
-			error: function (x, y, z) {alert(y);}
+			error: function (x, y, z) {console.log(y);}
         });
     };
     
@@ -423,9 +620,127 @@ function InfoBox(containerId, systemNodes, infoBoxConfig) {
         data = JSON.parse(data);
         this.series[this.series.length] = data;
         
+        // TODO: vrstni red seriesov je pomemben - včasih se prej naloada drugi, kakor prvi (!)                
+        // find out series #
+        for (var i = 0; i < this.config.value.series.length; i++) {
+            if (this.config.value.series[i].sensorId == this.dataType) 
+                this.seriesN[this.series.length - 1] = i;
+        }
+        
         // is all the data loaded?
         if (this.series.length == this.config.value.series.length) {
             switch (this.config.value.type) {
+                case "metricsAbsolute":
+                    // set indexes of primary and secondary timeseries
+                    // secondary seriesN = 0, primary seriesN = 1
+                    // default
+                    var secondaryN = 0;                    
+                    var primaryN = 1; // index in primary timeseries
+                    
+                    // reverse load
+                    if (this.seriesN[0] == 1) {
+                        secondaryN = 1;
+                        primaryN = 0;
+                    }
+                    
+                    var secondary = this.series[secondaryN];
+                    
+                    console.log(this.series);
+                    
+                    // primary series must be prediction, secondary series is measurements
+                    secN = 0;
+                    N = 0;
+                    sum = 0;
+                    sum2 = 0;
+                    realSum = 0;
+                    
+                    $.each(this.series[primaryN], function(mid, point) {                        
+                        while ((secondary[secN].Timestamp < point.Timestamp) && (secN < secondary.length -  1)) {
+                            secN++;
+                        }
+                        
+                        if (secondary[secN].Timestamp == point.Timestamp) {
+                            N++;
+                            sum += Math.abs(point.Val - secondary[secN].Val);
+                            realSum += Math.abs(point.Val);
+                            sum2 += (point.Val - secondary[secN].Val) * (point.Val - secondary[secN].Val);
+                        }                                                
+                    })
+                    
+                    var mae = sum/N;
+                    var rmse = Math.sqrt(sum2/N);
+                    var mapez = (sum/N) / (realSum/N);
+                                        
+                    maeOK = this.transform(mae, this.systemNodes.sensorTable[this.config["value"]["series"][0]["sensorId"]]["UoM"], this.config.value );
+                    rmseOK = this.transform(rmse, this.systemNodes.sensorTable[this.config["value"]["series"][0]["sensorId"]]["UoM"], this.config.value );
+                    mapezOK = this.transform(mapez, this.systemNodes.sensorTable[this.config["value"]["series"][0]["sensorId"]]["UoM"], this.config.value );
+                                        
+                    $("#" + containerId + " > .stats-info p").html(maeOK + " / " + rmseOK /* + " / " + mapezOK */);
+                    
+                    break;
+                case "metricsRelative":
+                    // set indexes of primary and secondary timeseries
+                    // secondary seriesN = 0, primary seriesN = 1
+                    // default
+                    var secondaryN = 0;                    
+                    var primaryN = 1; // index in primary timeseries
+                    
+                    // reverse load
+                    if (this.seriesN[0] == 1) {
+                        secondaryN = 1;
+                        primaryN = 0;
+                    }
+                    
+                    var secondary = this.series[secondaryN];
+                    
+                    console.log(this.series);
+                    
+                    // primary series must be prediction, secondary series is measurements
+                    secN = 0;
+                    N = 0;
+                    sum = 0;    
+                    
+                    // R2
+                    sst = 0;
+                    sse = 0;
+                    mean = 0;
+                    sumTrue = 0;
+                    sumTrue2 = 0;
+                    
+                    $.each(this.series[primaryN], function(mid, point) {                        
+                        while ((secondary[secN].Timestamp < point.Timestamp) && (secN < secondary.length -  1)) {
+                            secN++;
+                        }
+                        
+                        if (secondary[secN].Timestamp == point.Timestamp) {
+                            N++;
+                            sum += Math.abs((point.Val - secondary[secN].Val) / point.Val);                            
+                            
+                            // R2 metrics
+                            sumTrue += point.Val;
+                            sumTrue2 += point.Val * point.Val;
+                            mean = sumTrue/N;
+                            
+                            sse += (point.Val - secondary[secN].Val) * (point.Val - secondary[secN].Val);
+                            sst = sumTrue2 - N * mean * mean;                            
+                        }                                                
+                    })
+                    
+                    var mape = sum/N;                    
+                    if (sst == 0.0) {
+                        if (sse == 0) r2 = 1.0;
+                        else r2 = 0.0;
+                    } else {
+                        r2 = 1 - sse/sst;
+                    }
+                                        
+                    mapeOK = this.transform(mape, this.systemNodes.sensorTable[this.config["value"]["series"][0]["sensorId"]]["UoM"], this.config.value );
+                    r2OK = this.transform(r2, this.systemNodes.sensorTable[this.config["value"]["series"][0]["sensorId"]]["UoM"], this.config.value );
+                    
+                                        
+                    $("#" + containerId + " > .stats-info p").html(mapeOK + " / " + r2OK);
+                    
+                    break;
                 case "tsValue":
                     // default is now
                     var ts = new Date();
@@ -446,14 +761,245 @@ function InfoBox(containerId, systemNodes, infoBoxConfig) {
                                         
                     $("#" + containerId + " > .stats-info p").html(bestValue);
                     break;
+                case "sumMembers":
+                    this.hookSum(containerId);
+                    break;
+                case "sumMembersPercent":
+                    this.hookPercent(containerId, this.config.value.denominator);
+                    this.hookSum(containerId);                    
+                    break;
+                case "cumulativeThreshold":                    
+                    var pTsOld = 0;
+                    var threshold = this.config.value.threshold;                    
+                    var cumulative = 0.0;
+                                                            
+                    // follow master series
+                    $.each(this.series[0], function(sid, point) {
+                        pTs = new Date(point.Timestamp);
+                        if (pTsOld != 0) {                            
+                            var interval = (pTs - pTsOld) / 1000 / 60 / 60;
+                            var value = point.Val;
+                            
+                            if (value > threshold) {
+                                cumulative += interval * value;                                                        
+                            }
+                        }
+                        pTsOld = pTs;
+                    });
+                    ctValue = this.transform(cumulative, this.systemNodes.sensorTable[this.config["value"]["series"][0]["sensorId"]]["UoM"], this.config.value);
+                    $("#" + containerId + " > .stats-info p").html(ctValue);
+                    
+                    // manage status
+                    if (this.config.status.value == "") {
+                        statusValue = this.transform(cumulative, "", this.config.status);
+                        $("#" + containerId + " .stats-link a").html(statusValue);
+                    }                   
+                    break;
+                case "cumulativeThresholdSec":                    
+                    var pTsOld = 0;
+                    var threshold = this.config.value.threshold;                    
+                    var cumulative = 0.0;
+                    
+                    var secondaryIndex = 0; // index in secondary timeseries
+                    
+                    // set indexes of primary and secondary timeseries
+                    // secondary seriesN = 0, primary seriesN = 1
+                    // default
+                    var secondaryN = 0;                    
+                    var primaryN = 1; // index in primary timeseries
+                    
+                    // reverse load
+                    if (this.seriesN[0] == 1) {
+                        secondaryN = 1;
+                        primaryN = 0;
+                    }
+                    
+                    // secondary series
+                    var secondary = this.series[secondaryN];
+                    // follow master series
+                    $.each(this.series[primaryN], function(sid, point) {
+                        pTs = new Date(point.Timestamp);
+                        if (pTsOld != 0) {
+                            var interval = (pTs - pTsOld) / 1000 / 60 / 60;
+                            var value = point.Val;
+                            
+                            if (value > threshold) {
+                                // threshold is on (ie. lights are on), let's check secondary value (ie. presence)
+                                // traverse secondary timeseries until timestamp >= of the current, then use the point
+                                // closest to current timestamp
+                                while ((secondaryIndex < (secondary.length - 1)) && (new Date(secondary[secondaryIndex].Timestamp) < pTs)) {
+                                    secondaryIndex++;
+                                }
+                                var date1 = new Date(secondary[secondaryIndex].Timestamp);
+                                if (secondaryIndex > 0 ) var date2 = new Date(secondary[secondaryIndex - 1].Timestamp);
+                                    else var date2 = date1;
+                                
+                                if (Math.abs(date1 - pTs) < Math.abs(date2 - pTs)) theIndex = secondaryIndex; else theIndex = secondaryIndex - 1;
+                                if (theIndex < 0) theIndex = 0;
+                                
+                                if (secondary[theIndex].Val == 0) cumulative += interval * value;                                                        
+                            }
+                        }
+                        pTsOld = pTs;
+                    });
+                    ctValue = this.transform(cumulative, this.systemNodes.sensorTable[this.config["value"]["series"][0]["sensorId"]]["UoM"], this.config.value);
+                    $("#" + containerId + " > .stats-info p").html(ctValue);
+                    
+                    // manage status
+                    if (this.config.status.value == "") {
+                        statusValue = this.transform(cumulative, "", this.config.status);
+                        $("#" + containerId + " .stats-link a").html(statusValue);
+                    }                   
+                    break;
+                case "cumulativeThresholdOther":                    
+                    var pTsOld = 0;
+                    var threshold = this.config.value.threshold;
+                    var mapValue = this.config.value.value; 
+                    var cumulative = 0.0;
+                    $.each(this.series[0], function(sid, point) {
+                        pTs = new Date(point.Timestamp);
+                        if (pTsOld != 0) {
+                            var interval = (pTs - pTsOld) / 1000 / 60 / 60;
+                            var value = point.Val;
+                            
+                            if (value > threshold) cumulative += interval * mapValue;                                                        
+                        }
+                        pTsOld = pTs;
+                    });
+                    ctValue = this.transform(cumulative, this.systemNodes.sensorTable[this.config["value"]["series"][0]["sensorId"]]["UoM"], this.config.value);
+                    $("#" + containerId + " > .stats-info p").html(ctValue);
+                    
+                    // manage status
+                    if (this.config.status.value == "") {
+                        statusValue = this.transform(cumulative, "", this.config.status);
+                        $("#" + containerId + " .stats-link a").html(statusValue);
+                    }                    
+                    break;
+                case "cumulativeThresholdOtherSec":                    
+                    var pTsOld = 0;
+                    var threshold = this.config.value.threshold;
+                    var mapValue = this.config.value.value; 
+                    var cumulative = 0.0;
+                    var secondaryIndex = 0; // index in secondary timeseries
+                    
+                    // set indexes of primary and secondary timeseries
+                    // secondary seriesN = 0, primary seriesN = 1
+                    // default
+                    var secondaryN = 0;                    
+                    var primaryN = 1; // index in primary timeseries
+                    
+                    // reverse load
+                    if (this.seriesN[0] == 1) {
+                        secondaryN = 1;
+                        primaryN = 0;
+                    }
+                    
+                    // secondary series
+                    var secondary = this.series[secondaryN];
+                    // follow master series
+                    $.each(this.series[primaryN], function(sid, point) {
+                        pTs = new Date(point.Timestamp);
+                        if (pTsOld != 0) {
+                            var interval = (pTs - pTsOld) / 1000 / 60 / 60;
+                            var value = point.Val;
+                            
+                            if (value > threshold) {
+                                // threshold is on (ie. lights are on), let's check secondary value (ie. presence)
+                                // traverse secondary timeseries until timestamp >= of the current, then use the point
+                                // closest to current timestamp
+                                while ((secondaryIndex < (secondary.length - 1)) && (new Date(secondary[secondaryIndex].Timestamp) < pTs)) {
+                                    secondaryIndex++;
+                                }
+                                var date1 = new Date(secondary[secondaryIndex].Timestamp);
+                                if (secondaryIndex > 0 ) var date2 = new Date(secondary[secondaryIndex - 1].Timestamp);
+                                    else var date2 = date1;
+                                
+                                if (Math.abs(date1 - pTs) < Math.abs(date2 - pTs)) theIndex = secondaryIndex; else theIndex = secondaryIndex - 1;
+                                if (theIndex < 0) theIndex = 0;
+                                
+                                if (secondary[theIndex].Val == 0) cumulative += interval * mapValue;                                                        
+                            }
+                        }
+                        pTsOld = pTs;
+                    });
+                    ctValue = this.transform(cumulative, this.systemNodes.sensorTable[this.config["value"]["series"][0]["sensorId"]]["UoM"], this.config.value);
+                    $("#" + containerId + " > .stats-info p").html(ctValue);
+                    
+                    // manage status
+                    if (this.config.status.value == "") {
+                        statusValue = this.transform(cumulative, "", this.config.status);
+                        $("#" + containerId + " .stats-link a").html(statusValue);
+                    }                    
+                    break;
                 default: console.log("No method for extracting infobox value!");
             }
             
         };
     }
     
+    
+    
+    this.hookSum = function(cId) {        
+        var _this = this;
+        setTimeout(function() { _this.computeSum(); }, 200);
+        console.log("SUM TIMEOUT: " + cId);
+    }
+    
+    this.computeSum = function() {        
+        // console.log("YES: " + containerId);
+        var sum = 0;
+        $("#" + containerId).parent().find(".widget-stats-small").each(function () {            
+            var valText = $(this).find("p")[0].innerHTML;
+            var val = parseFloat(valText);
+            sum += val;
+        });
+        
+        sumValue = this.transform(sum, this.systemNodes.sensorTable[this.config["value"]["series"][0]["sensorId"]]["UoM"], this.config.value);
+        
+        $("#" + containerId + " > .stats-info p").html(sumValue);
+                    
+        // manage status
+        if (this.config.status.value == "") {
+            statusValue = this.transform(sum, "", this.config.status);
+            $("#" + containerId + " .stats-link a").html(statusValue);
+        }         
+        
+        // manage pecentages
+        $("#" + containerId).parent().find(".widget-stats-small").each(function () {            
+            var valText = $(this).find("p")[0].innerHTML;
+            var val = parseFloat(valText);
+            var percentage = Math.round(val / sum * 10000) / 100 + "%";
+            $(this).find(".stats-link .percentage")[0].innerHTML = percentage;
+        });
+        
+        // setTimeout(this.computeSum(cId), 1000);
+        var _this = this;
+        setTimeout(function() { _this.computeSum(); }, 1000);
+    }
+    
+  
+    this.hookPercent = function(cId, denominator) {
+        this.denominator = denominator;
+        var _thisP = this;
+        setTimeout(function() { _thisP.computePercent(denominator); }, 200);  
+        console.log("PERCENT TIMEOUT: " + cId);
+    }
+    
+    this.computePercent = function(denominator) {                
+        var _this = this;
+        var dValue = parseFloat($(denominator).html());
+        var myValue = parseFloat($("#" + containerId + " > .stats-info p").html());
+        
+        var percent = Math.round(myValue/dValue * 10000)/100;
+        $("#" + containerId + " > .stats-info > .percentage").html("(" + percent + "%)")
+        
+        setTimeout(function() { _this.computePercent(denominator); }, 1000);
+    }
+        
+  
+    
+    
 }
-
 
 /**
  * Highchart object - graph and data management
@@ -795,3 +1341,4 @@ function HighChart(container, chartNumber, systemNodes) {
         console.log("Added series: " + dataType + "(" + timeInterval + "-" + aggregateType + ")" + ": " + datayDescription + " - " + datayUnit + addedNumber + ".");
     };
 };
+
