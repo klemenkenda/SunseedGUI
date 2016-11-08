@@ -331,6 +331,35 @@ function getPredictions($sensor, $method, $start, $end) {
     return json_encode($json);
 }
 
+
+//---------------------------------------------------------------------
+// FUNCTION: pushPredictions
+// Description: Pushes predictions to MySQL DB
+//---------------------------------------------------------------------
+function pushPredictions() {    
+    if ($_POST["data"] == "") return apiError("No data!");
+        
+    $json = $_POST["data"];
+    $data = json_decode($json);    
+    foreach ($data as $item) {
+        $name = $item->{"name"};
+        $method = $item->{"method"};
+        $time = $item->{"time"};
+        $value = $item->{"value"};
+        
+        $SQL = "INSERT INTO predictions (pr_sensor, pr_type, pr_timestamp, pr_value) VALUES ('" . $name . "', '" . $method . "', '" . $time . "', " . $value . ")";
+        $SQL .= " ON DUPLICATE KEY UPDATE pr_value = " . $value;
+    
+        mysql_query($SQL);
+    }
+        
+    return mysql_error();
+}
+
+
+// SELECT DISTINCT(pr_sensor), MAX(pr_timestamp) AS maxts, MIN(pr_timestamp) FROM `predictions` GROUP BY(pr_sensor) ORDER BY maxts DESC
+
+
 //---------------------------------------------------------------------
 // FUNCTION: exportDataCleaning
 // Description: Exports data for Data Cleaning NRG4Cast D2.3
@@ -525,7 +554,13 @@ function pluginAPIGET() {
 			}
 			break;
             
-		// EXPORTING DATA			
+		
+        // IMPORTING PREDICTION DATA
+        case "push-predictions":
+            $HTML = pushPredictions($par[0]);            
+            break;
+            
+        // EXPORTING DATA			
 		case "export-all-measurements":
 		  if ($pars == 1) {
 		    $HTML = exportAllMeasurements($par[0]);
