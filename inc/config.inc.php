@@ -20,8 +20,10 @@ $webmaster_mail = "klemen.kenda@ijs.si";
 $filesystem_root = "D:\\Seensy\\www\\";
 
 // miner config -------------------------------------------------------
-$miner["url"] = "http://127.0.0.1";
-$miner["port"] = 9301;
+$miner["url"] = "http://193.2.205.76";
+$miner["port"] = 9201;
+// $miner["url"] = "http://127.0.0.1";
+// $miner["port"] = 9301;
 $miner["stream_timeout"] = 20;
 $miner["socket_timeout"] = 10;
 

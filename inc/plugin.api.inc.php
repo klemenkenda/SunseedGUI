@@ -358,6 +358,7 @@ function pushPredictions() {
 
 
 // SELECT DISTINCT(pr_sensor), MAX(pr_timestamp) AS maxts, MIN(pr_timestamp) FROM `predictions` GROUP BY(pr_sensor) ORDER BY maxts DESC
+// SELECT DISTINCT(pr_sensor), pr_type, MAX(pr_timestamp) AS maxts, MIN(pr_timestamp) FROM `predictions` GROUP BY pr_sensor, pr_type ORDER BY maxts DESC
 
 
 //---------------------------------------------------------------------
